@@ -8,7 +8,7 @@ if (!isset($_SESSION['username']) || $_SESSION['role'] !== 'Admin') {
     <h2 style='color:#c0392b;'>Access Denied</h2>
     <p>You do not have permission to view this page.</p>
     <p style='color:#999;'>Redirecting...</p>
-    <script>setTimeout(() => window.location.href = 'index.html', 5000);</script>
+    <script>setTimeout(() => window.location.href = 'index.php', 5000);</script>
   </div>";
   exit();
 }
@@ -97,10 +97,11 @@ $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
   <div class="sidebar">
     <div class="logo">🛒</div>
     <ul>
-      <li><a href="index.html"><img src="icons/home.png" alt="Home" /></a></li>
-      <li><a href="order.html"><img src="icons/checkout.png" alt="Order" /></a></li>
-      <li><a href="inventory.html"><img src="icons/inventory.png" alt="Inventory" /></a></li>
+      <li><a href="index.php"><img src="icons/home.png" alt="Home" /></a></li>
+      <li><a href="order.php"><img src="icons/checkout.png" alt="Order" /></a></li>
+      <li><a href="inventory.php"><img src="icons/inventory.png" alt="Inventory" /></a></li>
       <li><a href="users.php"><img src="icons/user.png" alt="Users" /></a></li>
+      <li><a href="transactions.php"><img src="icons/transaction.png" alt="Transactions" /></a></li>
       <li><a href="logout.php"><img src="icons/power.png" alt="Logout" /></a></li>
     </ul>
   </div>

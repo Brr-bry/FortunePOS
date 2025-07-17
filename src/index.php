@@ -15,6 +15,7 @@
       <li><a href="order.php"><img src="icons/checkout.png" alt="Checkout" /></a></li>
       <li><a href="inventory.php"><img src="icons/inventory.png" alt="Inventory" /></a></li>
       <li><a href="users.php"><img src="icons/user.png" alt="Users" /></a></li>
+      <li><a href="transactions.php"><img src="icons/transaction.png" alt="Transactions" /></a></li>
       <li><a href="logout.php"><img src="icons/power.png" alt="Logout" /></a></li>
     </ul>
   </div>
@@ -54,10 +55,11 @@
 
         <div class="quick-access-panel">
           <h3>Quick Access</h3>
-          <a href="order.html"><button>Order</button></a>
+          <a href="order.php"><button>Order</button></a>
           <a href="inventory.php"><button>Inventory</button></a>
           <a href="users.php"><button>Manage Users</button></a>
-        </div>
+          <a href="transactions.php"><button>Transactions</button></a>
+      </div>
       </div>
     </div>
   </div>

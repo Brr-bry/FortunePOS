@@ -21,12 +21,14 @@ unset($_SESSION['login_error']);
     <?php if ($error): ?>
       <div class="error-message"><?= htmlspecialchars($error) ?></div>
     <?php endif; ?>
-    <form class="login-form" action="process_login.php" method="post">
+    
+    <!-- Disable autofill suggestions -->
+    <form class="login-form" action="process_login.php" method="post" autocomplete="off">
       <label for="username">Username</label>
-      <input type="text" id="username" name="username" placeholder="Enter username" required />
+      <input type="text" id="username" name="username" placeholder="Enter username" autocomplete="off" required />
 
       <label for="password">Password</label>
-      <input type="password" id="password" name="password" placeholder="Enter password" required />
+      <input type="password" id="password" name="password" placeholder="Enter password" autocomplete="new-password" required />
 
       <button type="submit">Login</button>
     </form>

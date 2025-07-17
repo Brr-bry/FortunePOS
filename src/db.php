@@ -2,7 +2,7 @@
 $host = 'localhost';
 $dbname = 'fortune_pos';
 $user = 'root';
-$pass = ''; // default is empty on XAMPP
+$pass = ''; 
 
 try {
   $conn = new PDO("mysql:host=$host;dbname=$dbname", $user, $pass);

@@ -59,8 +59,8 @@
   }
 
   .error-message {
-    background-color: #ffe6e6;       /* light red background */
-    color: #d8000c;                  /* 🔴 red text */
+    background-color: #ffe6e6;       
+    color: #d8000c;                  
     border: 1px solid #d8000c;
     padding: 12px 15px;
     border-radius: 8px;

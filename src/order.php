@@ -22,6 +22,7 @@ $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
       <li><a href="order.php"><img src="icons/checkout.png" alt="Order" /></a></li>
       <li><a href="inventory.php"><img src="icons/inventory.png" alt="Inventory" /></a></li>
       <li><a href="users.php"><img src="icons/user.png" alt="Users" /></a></li>
+      <li><a href="transactions.php"><img src="icons/transaction.png" alt="Transactions" /></a></li>
       <li><a href="logout.php"><img src="icons/power.png" alt="Logout" /></a></li>
     </ul>
   </div>

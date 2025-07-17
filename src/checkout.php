@@ -34,24 +34,30 @@
         </div>
       </div>
       <div class="cart-right">
-        <!-- Right side reserved for future -->
+        <!-- This area is for future features, like promotions or payment methods -->
       </div>
     </div>
   </div>
 
   <script>
+    // Get cart data from browser storage (saved earlier)
     const cart = JSON.parse(localStorage.getItem("cart") || "[]");
+
+    // Get references to the elements we want to update
     const cartItemsContainer = document.getElementById("cart-items");
     const subtotalSpan = document.getElementById("subtotal");
     const taxSpan = document.getElementById("tax");
     const totalSpan = document.getElementById("total");
 
+    // Display today's date in DD Mon YYYY format
     const dateNow = new Date().toLocaleDateString('en-GB', {
       day: '2-digit', month: 'short', year: 'numeric'
     });
     document.getElementById("order-date").textContent = dateNow;
 
     let subtotal = 0;
+
+    // Loop through each item in the cart and show it on the page
     cart.forEach(item => {
       const itemDiv = document.createElement("div");
       itemDiv.className = "item";
@@ -64,18 +70,21 @@
         </div>
       `;
       cartItemsContainer.appendChild(itemDiv);
-      subtotal += item.price * item.qty;
+      subtotal += item.price * item.qty; // Add to subtotal
     });
 
+    // Calculate tax and total
     const tax = subtotal * 0.10;
     const total = subtotal + tax;
 
+    // Update the values in the summary box
     subtotalSpan.textContent = `${subtotal} PHP`;
     taxSpan.textContent = `${tax.toFixed(0)} PHP`;
     totalSpan.textContent = `${total.toFixed(0)} PHP`;
 
-    // ✅ Send order to backend when Complete Order is clicked
+    // Handle click on "Complete Order" button
     document.getElementById("complete-order").addEventListener("click", function () {
+      // Send cart data to backend for processing
       fetch("complete_order.php", {
         method: "POST",
         headers: {
@@ -85,14 +94,15 @@
       })
         .then((res) => res.text())
         .then((data) => {
+          // If success, go to receipt page
           if (data.trim() === "success") {
-            window.location.href = "receipt.html"; // redirect after success
+            window.location.href = "receipt.html";
           } else {
-            alert("Order failed: " + data);
+            alert("Order failed: " + data); // Show error from server
           }
         })
         .catch((err) => {
-          alert("Something went wrong.");
+          alert("Something went wrong."); // Show error if request fails
           console.error(err);
         });
     });

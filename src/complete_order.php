@@ -10,12 +10,22 @@ if (empty($cart)) {
   exit;
 }
 
+$total = 0;
+foreach ($cart as $item) {
+  $total += $item['price'] * $item['qty'];
+}
+
+// INSERT the main order
+$insertOrder = $conn->prepare("INSERT INTO orders (total) VALUES (?)");
+$insertOrder->execute([$total]);
+$order_id = $conn->lastInsertId();
+
+// Insert items and update stock
 foreach ($cart as $item) {
   $name = $item['name'];
   $qty = (int)$item['qty'];
   $price = (float)$item['price'];
 
-  // Get current stock
   $stmt = $conn->prepare("SELECT stock FROM products WHERE name = ?");
   $stmt->execute([$name]);
   $row = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -27,21 +37,18 @@ foreach ($cart as $item) {
   }
 
   $currentStock = (int)$row['stock'];
-  $newStock = $currentStock - $qty;
-
-  if ($newStock < 0) {
+  if ($currentStock < $qty) {
     http_response_code(400);
     echo "Not enough stock for: " . $name;
     exit;
   }
 
-  // Update stock
+  $newStock = $currentStock - $qty;
   $update = $conn->prepare("UPDATE products SET stock = ? WHERE name = ?");
   $update->execute([$newStock, $name]);
 
-  // 🔥 INSERT into orders table
-  $insert = $conn->prepare("INSERT INTO orders (name, quantity, price, created_at) VALUES (?, ?, ?, NOW())");
-  $insert->execute([$name, $qty, $price]);
+  $insertItem = $conn->prepare("INSERT INTO order_items (order_id, product_name, quantity, price) VALUES (?, ?, ?, ?)");
+  $insertItem->execute([$order_id, $name, $qty, $price]);
 }
 
 echo "success";

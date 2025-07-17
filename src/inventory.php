@@ -46,10 +46,11 @@ $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <aside class="sidebar">
       <div class="logo">🛒</div>
       <nav>
-        <a href="index.html"><img src="icons/home.png" alt="Home"></a>
-        <a href="order.html"><img src="icons/checkout.png" alt="Checkout"></a>
+        <a href="index.php"><img src="icons/home.png" alt="Home"></a>
+        <a href="order.php"><img src="icons/checkout.png" alt="Checkout"></a>
         <a href="inventory.php"><img src="icons/inventory.png" alt="Inventory"></a>
         <a href="users.php"><img src="icons/user.png" alt="Users"></a>
+        <a href="transactions.php"><img src="icons/transaction.png" alt="Transactions" /></a>
         <a href="logout.php"><img src="icons/power.png" alt="Logout"></a>
       </nav>
     </aside>

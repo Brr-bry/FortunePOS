@@ -25,10 +25,6 @@
             <td colspan="2">TAX</td>
             <td id="tax">0 PHP</td>
           </tr>
-          <tr>
-            <td colspan="2">Delivery</td>
-            <td id="delivery">40 PHP</td>
-          </tr>
           <tr class="total-row">
             <td colspan="2"><strong>Total:</strong></td>
             <td><strong id="total">0 PHP</strong></td>
@@ -69,8 +65,7 @@
     });
 
     const tax = Math.round(subtotal * 0.10);
-    const delivery = 40;
-    const total = subtotal + tax + delivery;
+    const total = subtotal + tax;
 
     taxCell.textContent = `${tax} PHP`;
     totalCell.textContent = `${total} PHP`;
@@ -80,7 +75,7 @@
 
     // Redirect to index.html after 5 seconds
     setTimeout(() => {
-      window.location.href = "index.html";
+      window.location.href = "index.php";
     }, 5000);
   </script>
 </body>
