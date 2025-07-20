@@ -1,12 +1,25 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Checkout - Fortune POS</title>
-  <link rel="stylesheet" href="checkout.css" />
-</head>
+<?php 
+
+  
+  session_start();
+  if (!isset($_SESSION['username'])) {
+    echo "
+    <div style='display:flex;justify-content:center;align-items:center;height:100vh;font-family:sans-serif;flex-direction:column;text-align:center;'>
+      <h2 style='color:#c0392b;'>Access Denied</h2>
+      <p>You do not have permission to view this page.</p>
+      <p style='color:#999;'>Redirecting...</p>
+      <script>setTimeout(() => window.location.href = '../login.php', 5000);</script>
+    </div>";
+    exit();
+  }
+
+  $title = 'FortunePOS - Checkout';
+  require_once '../includes/head.php';
+?>
 <body>
+  <div class="main-content">
   <div class="checkout-container">
     <div class="checkout-box">
       <div class="cart-left">
@@ -30,15 +43,22 @@
               <strong id="total">0 PHP</strong>
             </div>
           </div>
-          <button id="complete-order" class="complete-order-btn">Complete Order</button>
+          <div class="row" style="margin-bottom:15px;">
+            <label for="payment-method"><strong>Payment Method:</strong></label>
+            <select id="payment-method">
+              <option value="Cash">Cash</option>
+              <option value="GCash">GCash</option>
+            </select>
+          </div>
+            <button id="complete-order" class="complete-order-btn">Complete Order</button>
+            <button id="go-back" class="complete-order-btn delete"  style="margin-top:20px; background-color:#dc3545; ">Go Back</button>
+          
+          
         </div>
-      </div>
-      <div class="cart-right">
-        <!-- This area is for future features, like promotions or payment methods -->
       </div>
     </div>
   </div>
-
+  </div>
   <script>
     // Get cart data from browser storage (saved earlier)
     const cart = JSON.parse(localStorage.getItem("cart") || "[]");
@@ -49,7 +69,6 @@
     const taxSpan = document.getElementById("tax");
     const totalSpan = document.getElementById("total");
 
-    // Display today's date in DD Mon YYYY format
     const dateNow = new Date().toLocaleDateString('en-GB', {
       day: '2-digit', month: 'short', year: 'numeric'
     });
@@ -57,7 +76,6 @@
 
     let subtotal = 0;
 
-    // Loop through each item in the cart and show it on the page
     cart.forEach(item => {
       const itemDiv = document.createElement("div");
       itemDiv.className = "item";
@@ -65,46 +83,33 @@
         <div class="product-line">
           <div>
             <div><strong>${item.name}</strong></div>
-            <div>${item.price} PHP ×${item.qty}</div>
+            <div>${item.price.toFixed(2)} PHP ×${item.qty}</div>
           </div>
         </div>
       `;
       cartItemsContainer.appendChild(itemDiv);
-      subtotal += item.price * item.qty; // Add to subtotal
+      subtotal += item.price * item.qty; 
     });
 
-    // Calculate tax and total
     const tax = subtotal * 0.10;
     const total = subtotal + tax;
 
-    // Update the values in the summary box
-    subtotalSpan.textContent = `${subtotal} PHP`;
-    taxSpan.textContent = `${tax.toFixed(0)} PHP`;
-    totalSpan.textContent = `${total.toFixed(0)} PHP`;
+    subtotalSpan.textContent = `${subtotal.toFixed(2)} PHP`;
+    taxSpan.textContent = `${tax.toFixed(2)} PHP`;
+    totalSpan.textContent = `${total.toFixed(2)} PHP`;
 
-    // Handle click on "Complete Order" button
     document.getElementById("complete-order").addEventListener("click", function () {
-      // Send cart data to backend for processing
-      fetch("complete_order.php", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ cart }),
-      })
-        .then((res) => res.text())
-        .then((data) => {
-          // If success, go to receipt page
-          if (data.trim() === "success") {
-            window.location.href = "receipt.html";
-          } else {
-            alert("Order failed: " + data); // Show error from server
-          }
-        })
-        .catch((err) => {
-          alert("Something went wrong."); // Show error if request fails
-          console.error(err);
-        });
+      const paymentMethod = document.getElementById("payment-method").value;
+      localStorage.setItem("paymentMethod", paymentMethod);
+      localStorage.setItem("totalDue", total.toFixed(2));
+      localStorage.setItem("cart", JSON.stringify(cart));
+      window.location.href = "./payment.php";
+    });
+
+    const backBtn = document.getElementById('go-back');
+    
+    backBtn.addEventListener("click", () => {
+      window.location.href = "./order.php";
     });
   </script>
 </body>

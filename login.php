@@ -1,20 +1,21 @@
 <?php
 session_start();
 if (isset($_SESSION['username'])) {
-  header("Location: index.php");
+  header("Location: ./admin/dashboard.php");
   exit();
 }
+
 $error = $_SESSION['login_error'] ?? '';
 unset($_SESSION['login_error']);
 ?>
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Login - Fortune POS</title>
-  <link rel="stylesheet" href="login.css" />
-</head>
+  <?php
+    $title = "FortunePOS";
+
+    require_once './includes/head.php';
+    echo "<link rel='icon' href='./admin/icons/logo.png'>";
+  ?>
 <body class="login-body">
   <div class="login-container">
     <h2>Welcome to <span>Fortune POS</span></h2>
@@ -22,7 +23,6 @@ unset($_SESSION['login_error']);
       <div class="error-message"><?= htmlspecialchars($error) ?></div>
     <?php endif; ?>
     
-    <!-- Disable autofill suggestions -->
     <form class="login-form" action="process_login.php" method="post" autocomplete="off">
       <label for="username">Username</label>
       <input type="text" id="username" name="username" placeholder="Enter username" autocomplete="off" required />

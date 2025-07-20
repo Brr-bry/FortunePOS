@@ -1,6 +1,6 @@
 <?php
 session_start();
-require 'db.php';
+require './includes/db.php';
 
 $username = $_POST['username'] ?? '';
 $password = $_POST['password'] ?? '';
@@ -12,10 +12,10 @@ $user = $stmt->fetch();
 if ($user && $user['password'] === $password) {
   $_SESSION['username'] = $user['username'];
   $_SESSION['role'] = $user['role'];
-  header("Location: index.php");
+  header("Location: ./admin/dashboard.php");
   exit();
 } else {
   $_SESSION['login_error'] = "Invalid username or password.";
-  header("Location: login.php");
+  header("Location: ./login.php");
   exit();
 }

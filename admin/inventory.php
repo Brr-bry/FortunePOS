@@ -1,6 +1,17 @@
 <?php
+
 session_start();
-require 'db.php';
+  if (!isset($_SESSION['username'])) {
+    echo "
+    <div style='display:flex;justify-content:center;align-items:center;height:100vh;font-family:sans-serif;flex-direction:column;text-align:center;'>
+      <h2 style='color:#c0392b;'>Access Denied</h2>
+      <p>You do not have permission to view this page.</p>
+      <p style='color:#999;'>Redirecting...</p>
+      <script>setTimeout(() => window.location.href = '../login.php', 5000);</script>
+    </div>";
+    exit();
+  }
+require '../includes/db.php';
 
 // Add or Edit
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
@@ -17,7 +28,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $stmt = $conn->prepare("UPDATE products SET name=?, stock=?, price=? WHERE id=?");
     $stmt->execute([$name, $stock, $price, $id]);
   }
-  header("Location: inventory.php");
+  header("Location: ./inventory.php");
   exit;
 }
 
@@ -30,41 +41,49 @@ if (isset($_GET['delete'])) {
   exit;
 }
 
-$stmt = $conn->query("SELECT * FROM products ORDER BY id ASC");
+  $stmt = $conn->query("SELECT * FROM products ORDER BY id ASC");
+
+
+
 $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
 
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <title>Inventory Management</title>
-  <link rel="stylesheet" href="inventory.css">
-</head>
+  <?php
+    $title = 'FortunePOS - Inventory';
+    include_once '../includes/head.php';
+  ?>
 <body>
   <div class="container">
-    <aside class="sidebar">
-      <div class="logo">🛒</div>
-      <nav>
-        <a href="index.php"><img src="icons/home.png" alt="Home"></a>
-        <a href="order.php"><img src="icons/checkout.png" alt="Checkout"></a>
-        <a href="inventory.php"><img src="icons/inventory.png" alt="Inventory"></a>
-        <a href="users.php"><img src="icons/user.png" alt="Users"></a>
-        <a href="transactions.php"><img src="icons/transaction.png" alt="Transactions" /></a>
-        <a href="logout.php"><img src="icons/power.png" alt="Logout"></a>
-      </nav>
-    </aside>
+    <?php
+      include_once '../includes/sidebar.php';
+    ?>
     <main class="main-content">
-      <header class="inventory-header">
-        <h1>Retail Business Co.</h1>
-        <input type="search" placeholder="Search...">
-      </header>
+      <?php
+        include_once '../includes/header.php';
+      ?>
+      <div style='width:100%; display:flex; flex-direction:row; justify-items: space-around; gap:100px;'>
+
+        
+      
       <section class="inventory">
         <div class="card">
           <h2>Inventory Management</h2>
+              <input type='text' name='search' class='search-input' placeholder='Search...' id="search-input"/>
+              
+          <span id="search-result"></span>
+          <?php 
+            if(isset($_GET['search']) && trim($_GET['search']) != ''){
+              ?>
+                <span>Results for <b><?php echo $_GET['search'];?></b></span>
+              <?php
+            }
+          ?>
           <table>
             <thead>
               <tr>
+                <th>ID</th>
                 <th>Product Name</th>
                 <th>Stock Left</th>
                 <th>Price</th>
@@ -73,6 +92,8 @@ $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
             <tbody id="product-table">
               <?php foreach ($products as $product): ?>
                 <tr onclick="selectRow(this)">
+                  
+                  <td><?= $product['id'] ?></td>
                   <td><?= htmlspecialchars($product['name']) ?></td>
                   <td><?= $product['stock'] ?></td>
                   <td><?= number_format($product['price'], 2) ?> PHP</td>
@@ -87,6 +108,36 @@ $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
           </div>
         </div>
       </section>
+      <section class='low-stock'>
+        <div >
+          <h2>Items Low On Stock (3 and Below)</h2>
+            <table>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Product Name</th>
+                <th>Stock Left</th>
+              </tr>
+            </thead>
+            <tbody >
+              <?php foreach ($products as $product): 
+                if($product['stock'] <= 3){
+
+                 ?>
+                <tr>
+                  
+                  <td><?= $product['id'] ?></td>
+                  <td><?= htmlspecialchars($product['name']) ?></td>
+                  <td><?= $product['stock'] ?></td>
+                </tr>
+              <?php } endforeach;  ?>
+            </tbody>
+            </table>
+        </div>
+      </section>
+      </div>
+      
+
     </main>
   </div>
 
@@ -154,6 +205,25 @@ $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
     function closeModal() {
       document.getElementById("modal").style.display = "none";
     }
+
+    function filterTable() {
+      const query = document.getElementById('search-input').value.toLowerCase();
+      const rows = document.querySelectorAll('#product-table tr');
+      let count = 0;
+      rows.forEach(row => {
+        const name = row.children[0].innerText.toLowerCase();
+        const id = name;
+        if (name.includes(query) || id.includes(query)) {
+          row.style.display = '';
+          count++;
+        } else {
+          row.style.display = 'none';
+        }
+      });
+      document.getElementById('search-result').innerHTML = query ? `Results for <b>${query}</b>: ${count}` : '';
+    }
+
+    document.getElementById('search-input').addEventListener('input', filterTable);
   </script>
 </body>
 </html>

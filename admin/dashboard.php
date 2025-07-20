@@ -1,34 +1,36 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Dashboard View</title>
-  <link rel="stylesheet" href="style.css" />
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-</head>
+  <?php
+
+    
+  session_start();
+  if (!isset($_SESSION['username'])) {
+    echo "
+    <div style='display:flex;justify-content:center;align-items:center;height:100vh;font-family:sans-serif;flex-direction:column;text-align:center;'>
+      <h2 style='color:#c0392b;'>Access Denied</h2>
+      <p>You do not have permission to view this page.</p>
+      <p style='color:#999;'>Redirecting...</p>
+      <script>setTimeout(() => window.location.href = '../login.php', 5000);</script>
+    </div>";
+    exit();
+  }
+    $title = 'FortunePOS - Dashboard';
+    require_once '../includes/head.php';
+  ?>
 <body>
-  <div class="sidebar">
-    <div class="logo">🛒</div>
-    <ul>
-      <li><a href="index.php"><img src="icons/home.png" alt="Home" /></a></li>
-      <li><a href="order.html"><img src="icons/checkout.png" alt="Checkout" /></a></li>
-      <li><a href="inventory.php"><img src="icons/inventory.png" alt="Inventory" /></a></li>
-      <li><a href="users.php"><img src="icons/user.png" alt="Users" /></a></li>
-      <li><a href="logout.php"><img src="icons/power.png" alt="Logout" /></a></li>
-    </ul>
-  </div>
 
-  <div class="main-content">
-    <div class="header">
-      <h2>Retail Business Co.</h2>
-      <input type="search" placeholder="Search..." />
-    </div>
-
+<?php require_once '../includes/sidebar.php'; ?>
+  
+<div class="main-content">
+  <?php require_once '../includes/header.php'; ?>
     <div class="dashboard-cards">
       <div class="card blue">
-        <h4>Total Sales Today</h4>
-        <h2 id="total-sales">0</h2>
+        <h4>Orders Today</h4>
+        <h2 id="total-orders" style = 'color:white;'>0</h2>
+      </div>
+      <div class="card blue">
+        <h4>Items Sold</h4>
+        <h2 id="total-sales"  style = 'color:white;'>0</h2>
       </div>
       <div class="revenue">
         <h4>Total Revenue</h4>
@@ -50,18 +52,21 @@
 
         <div class="quick-access-panel">
           <h3>Quick Access</h3>
-          <a href="order.html"><button>Order</button></a>
-          <a href="inventory.php"><button>Inventory</button></a>
-          <a href="users.php"><button>Manage Users</button></a>
-        </div>
+          <a href="./order.php"><button>Order</button></a>
+          <a href="./inventory.php"><button>Inventory</button></a>
+          <a href="./users.php"><button>Manage Users</button></a>
+          <a href="./transactions.php"><button>Transactions</button></a>
+      </div>
       </div>
     </div>
   </div>
 
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script>
     fetch('dashboard_data.php')
       .then(response => response.json())
       .then(data => {
+        document.getElementById("total-orders").textContent = data.total_orders || 0;
         document.getElementById("total-sales").textContent = data.total_sales || 0;
         document.getElementById("total-revenue").textContent = (data.total_revenue || 0) + " PHP";
 

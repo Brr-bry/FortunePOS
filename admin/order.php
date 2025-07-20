@@ -1,47 +1,55 @@
 <?php
-require 'db.php';
+session_start();
+  if (!isset($_SESSION['username'])) {
+    echo "
+    <div style='display:flex;justify-content:center;align-items:center;height:100vh;font-family:sans-serif;flex-direction:column;text-align:center;'>
+      <h2 style='color:#c0392b;'>Access Denied</h2>
+      <p>You do not have permission to view this page.</p>
+      <p style='color:#999;'>Redirecting...</p>
+      <script>setTimeout(() => window.location.href = '../login.php', 5000);</script>
+    </div>";
+    exit();
+  }
 
-// Load products with stock
+require '../includes/db.php';
+
 $stmt = $conn->prepare("SELECT * FROM products WHERE stock > 0");
+
+
 $stmt->execute();
 $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+
 ?>
 
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <title>Order - Fortune POS</title>
-  <link rel="stylesheet" href="order.css" />
-</head>
+  <?php 
+    $title = 'FortunePOS - Order';
+    include_once '../includes/head.php';
+  ?>
 <body>
-  <div class="sidebar">
-    <div class="logo">🛒</div>
-    <ul>
-      <li><a href="index.html"><img src="icons/home.png" alt="Home" /></a></li>
-      <li><a href="order.php"><img src="icons/checkout.png" alt="Order" /></a></li>
-      <li><a href="inventory.php"><img src="icons/inventory.png" alt="Inventory" /></a></li>
-      <li><a href="users.php"><img src="icons/user.png" alt="Users" /></a></li>
-      <li><a href="transactions.php"><img src="icons/transaction.png" alt="Transactions" /></a></li>
-      <li><a href="logout.php"><img src="icons/power.png" alt="Logout" /></a></li>
-    </ul>
-  </div>
+  <?php require_once '../includes/sidebar.php';?>
 
   <div class="main-content">
-    <div class="header">
-      <h2>Retail Business Co.</h2>
-      <input type="search" placeholder="Search..." />
-    </div>
+    <?php include_once '../includes/header.php';?>
 
     <div class="order-page">
+      
       <div class="product-list">
-        <h3>Available Products</h3>
+        <div style='display:flex; flex-direction:row; justify-content:space-around; align-items:center;'>
+          <h3>Available Products</h3>
+          <input type='text' id='search-input' class='search-input' placeholder='Search products...' oninput='filterProducts()'>
+          <span id="search-result"></span>
+        </div>
+        
         <?php foreach ($products as $product): ?>
-          <div class="product" 
-               data-id="<?= $product['id'] ?>" 
-               data-name="<?= htmlspecialchars($product['name']) ?>" 
-               data-price="<?= $product['price'] ?>" 
-               data-stock="<?= $product['stock'] ?>">
+          <div class="product"
+               data-id="<?= $product['id'] ?>"
+               data-name="<?= htmlspecialchars($product['name']) ?>"
+               data-price="<?= $product['price'] ?>"
+               data-stock="<?= $product['stock'] ?>"
+               id="product-<?= $product['id'] ?>">
             <p><?= htmlspecialchars($product['name']) ?> (₱<?= number_format($product['price'], 2) ?>) - Stock: <span class="stock"><?= $product['stock'] ?></span></p>
             <input type="number" min="1" max="<?= $product['stock'] ?>" value="1" class="qty-input">
             <button onclick="addToCart(this)">Add</button>
@@ -104,7 +112,6 @@ function updateCartUI() {
   const tbody = document.querySelector('#cart-table tbody');
   tbody.innerHTML = '';
   let total = 0;
-
   cart.forEach((item, i) => {
     const row = document.createElement('tr');
     row.innerHTML = `
@@ -137,6 +144,23 @@ function goToCheckout() {
   }
   localStorage.setItem("cart", JSON.stringify(cart));
   window.location.href = "checkout.php";
+}
+
+function filterProducts() {
+  const query = document.getElementById('search-input').value.toLowerCase();
+  const products = document.querySelectorAll('.product');
+  let count = 0;
+  products.forEach(product => {
+    const name = product.dataset.name.toLowerCase();
+    const id = product.dataset.id.toLowerCase();
+    if (name.includes(query) || id.includes(query)) {
+      product.style.display = '';
+      count++;
+    } else {
+      product.style.display = 'none';
+    }
+  });
+  document.getElementById('search-result').innerHTML = query ? `Results for <b>${query}</b>: ${count}` : '';
 }
 </script>
 </body>

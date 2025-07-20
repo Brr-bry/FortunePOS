@@ -1,5 +1,5 @@
 <?php
-require 'db.php';
+require '../includes/db.php';
 
 $stmt = $conn->query("SELECT username, role FROM users ORDER BY id ASC");
 $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
